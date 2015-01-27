@@ -11,32 +11,38 @@ end
 class Github
   include HTTParty
   base_uri 'https://api.github.com'
+  # basic_auth ENV['apitestfun'], ENV['ironyard1']
 
-  def self.get_followers(screen_name)
-    HTTParty.get("#{base_uri}/users/#{screen_name}/followers")
+  def initialize(user = 'apitestfun', pass = 'ironyard1')
+    @auth = {:username => user, :password => pass}
   end
 
-  def self.get_user(screen_name)
-    HTTParty.get("#{base_uri}/users/#{screen_name}")
+  def get_followers(username, options = {})
+    options.merge!({:basic_auth => @auth})
+    resp = self.class.get("/users/#{username}/followers", options)
+    data = JSON.parse(resp.body)
   end
-end
 
-class CheepcreepApp
+  def get_user(username, options = {})
+    options.merge!({:basic_auth => @auth})
+    response = self.class.get("/users/#{username}", options)
+    JSON.parse(response.body)
+  end
 
-  def twenty_followers(screen_name)
-    Github.get_followers(screen_name).sample(20).each do |rec|
-      save_user_info(Github.get_user(rec['login']))    
+  def twenty_followers(username)
+    get_followers(username, @auth).sample(20).each do |rec|
+      save_user_info(get_user(rec['login']))    
     end
   end
 
-  def save_user_info(screen_name)
+  def save_user_info(username)
     Cheepcreep::GithubUser.create(
-          :login => screen_name['login'], 
-          :name => screen_name['name'], 
-          :public_repos => screen_name['public_repos'], 
-          :followers => screen_name['followers'],
-          :following => screen_name['following'],
-          :blog => screen_name['blog'])
+          :login => username['login'], 
+          :name => username['name'], 
+          :public_repos => username['public_repos'], 
+          :followers => username['followers'],
+          :following => username['following'],
+          :blog => username['blog'])
   end
 
   def top_users(default = 'redline6561')
@@ -65,7 +71,8 @@ class CheepcreepApp
   end
 end
 
-creeps = CheepcreepApp.new
+#binding.pry
+creeps = Github.new
 creeps.top_users
 
 
