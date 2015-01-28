@@ -11,26 +11,45 @@ end
 class Github
   include HTTParty
   base_uri 'https://api.github.com'
-  # basic_auth ENV['apitestfun'], ENV['ironyard1']
+  basic_auth ENV['GITHUB_USER'], ENV['GITHUB_PASS']
 
-  def initialize(user = 'apitestfun', pass = 'ironyard1')
-    @auth = {:username => user, :password => pass}
-  end
-
-  def get_followers(username, options = {})
-    options.merge!({:basic_auth => @auth})
-    resp = self.class.get("/users/#{username}/followers", options)
+  def get_followers(username = 'redline6561')
+    resp = self.class.get("/users/#{username}/followers")
     data = JSON.parse(resp.body)
   end
 
-  def get_user(username, options = {})
-    options.merge!({:basic_auth => @auth})
-    response = self.class.get("/users/#{username}", options)
+  def get_user(username = 'redline6561')
+    response = self.class.get("/users/#{username}")
     JSON.parse(response.body)
   end
 
-  def twenty_followers(username)
-    get_followers(username, @auth).sample(20).each do |rec|
+  def list_gists(username = 'nickray22')
+    response = self.class.get("/users/#{username}/gists")
+    JSON.parse(response.body)
+  end
+
+  def create_gist
+
+  end
+
+  def edit_gist
+
+  end
+
+  def delete_gists(id)
+    self.class.delete("/gists/#{id}")
+  end
+
+  def star_gists(id)
+    self.class.put("/gists/#{id}/star")
+  end
+
+  def unstar_gists(id)
+    self.class.delete("/gists/#{id}/star")
+  end
+  
+  def twenty_followers(username = 'redline6561')
+    get_followers(username).sample(20).each do |rec|
       save_user_info(get_user(rec['login']))    
     end
   end
@@ -71,7 +90,7 @@ class Github
   end
 end
 
-#binding.pry
+binding.pry
 creeps = Github.new
 creeps.top_users
 
