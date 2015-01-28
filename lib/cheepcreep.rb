@@ -28,12 +28,14 @@ class Github
     JSON.parse(response.body)
   end
 
-  def create_gist
-
+  def create_gist(opts = {})
+    options = {:body => opts.to_json}
+    response = self.class.post("/gists")
+    JSON.parse(response.body)
   end
 
   def edit_gist
-
+    response = self.class.patch("/gists/#{id}")
   end
 
   def delete_gists(id)
