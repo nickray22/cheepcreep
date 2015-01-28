@@ -30,7 +30,7 @@ class Github
 
   def create_gist(opts = {})
     options = {:body => opts.to_json}
-    response = self.class.post("/gists")
+    response = self.class.post("/gists", options)
     JSON.parse(response.body)
   end
 
