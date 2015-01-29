@@ -28,25 +28,34 @@ class Github
     JSON.parse(response.body)
   end
 
-  def create_gist(opts = {})
-    options = {:body => opts.to_json}
+  def create_gist(options = {})
+    info = {:description => "post",
+            :public => true,
+            :files => {"homework.txt" => {:content => "empty"}}}
+    options = {:body => info.to_json}
     response = self.class.post("/gists", options)
     JSON.parse(response.body)
   end
 
-  def edit_gist
-    response = self.class.patch("/gists/#{id}")
+  def edit_gist(id, options = {})
+    info = {:description => "edited post", 
+            :files => {"homework.txt" => {:content => "update file contents"}},
+            :"homework.txt" => {:filename => {"new_homework.txt" => {:content => "modified contents"}}},
+            :"new_homework.text" => {:content => "a new file"}} 
+    options = {:body => info.to_json}
+    response = self.class.patch("/gists/#{id}", options)
+    JSON.parse(response.body)
   end
 
-  def delete_gists(id)
-    self.class.delete("/gists/#{id}")
+  def delete_gist(id)
+    response = self.class.delete("/gists/#{id}")
   end
 
-  def star_gists(id)
+  def star_gist(id)
     self.class.put("/gists/#{id}/star")
   end
 
-  def unstar_gists(id)
+  def unstar_gist(id)
     self.class.delete("/gists/#{id}/star")
   end
   
