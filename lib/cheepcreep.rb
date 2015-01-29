@@ -48,7 +48,7 @@ class Github
   end
 
   def delete_gist(id)
-    response = self.class.delete("/gists/#{id}")
+    self.class.delete("/gists/#{id}")
   end
 
   def star_gist(id)
